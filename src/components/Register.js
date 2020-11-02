@@ -11,7 +11,7 @@ const Register = () => {
     acceptTerms: true,
   });
   const [error, setError] = React.useState("");
-  const [errorFields, setErrorFields] = React.useState([]);
+  const [errorFields, setErrorFields] = React.useState({});
   const [success, setSuccess] = React.useState("");
 
   const handleRegister = (e) => {
@@ -21,20 +21,19 @@ const Register = () => {
     axios
       .post("http://apidev.pluginesia.com/api/register", submit)
       .then((response) => {
-        // jika response tidak ok
-        if (response.status !== 200) {
-          throw new Error(response);
-        }
-
-        // jika response ok
+        // jika response ok, tampilkan pesan success
         setSuccess(response.data.message);
-        console.log(response.data.message);
+        // hapus pesan error
+        setError("");
+        setErrorFields({});
       })
       .catch((error) => {
+        // jika email sdh ada
         setError(error.response.data.message);
-        setErrorFields(error.response.errors);
-        console.log(error.response.errors);
-        console.log(error.response.data.message);
+        // error per field
+        setErrorFields(error.response.data.errors);
+        // hapus pesan success
+        setSuccess("");
       });
   };
 
@@ -47,73 +46,48 @@ const Register = () => {
 
   return (
     <form onSubmit={handleRegister}>
-      {/* Peringatan error dan success */}
+      {/* peringatan error dan success */}
       <div className="mt-5">
         {error && <p className="text-danger">{error}</p>}
-
-        {errorFields &&
-          errorFields.map((field) =>
-            field.map((text) => <p className="text-danger">{text}</p>)
-          )}
-
         {success && <p className="text-success">{success}</p>}
       </div>
 
-      {/* Fullname */}
-      <div className="form-group">
-        <label htmlFor="fullName">Fullname</label>
-        <input
-          type="text"
-          className="form-control"
-          id="fullName"
-          aria-describedby="emailHelp"
-          onChange={handleChange}
-        />
-      </div>
+      {/* fields di looping */}
+      {fields.map((field, i) => (
+        <div className="form-group" key={i.toString()}>
+          <label htmlFor={field.name}>Password</label>
+          <input
+            type={field.type}
+            className="form-control"
+            id={field.name}
+            onChange={handleChange}
+          />
+          {errorFields[field.error] &&
+            errorFields[field.error].map((error, i) => (
+              <small
+                id={field.name}
+                className="form-text text-danger"
+                key={i.toString()}
+              >
+                {error}
+              </small>
+            ))}
+        </div>
+      ))}
 
-      {/* Email */}
-      <div className="form-group">
-        <label htmlFor="email">Email address</label>
-        <input
-          type="email"
-          className="form-control"
-          id="email"
-          aria-describedby="emailHelp"
-          onChange={handleChange}
-        />
-        <small id="emailHelp" className="form-text text-muted">
-          We'll never share your email with anyone else.
-        </small>
-      </div>
-
-      {/* Password */}
-      <div className="form-group">
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          className="form-control"
-          id="password"
-          onChange={handleChange}
-        />
-      </div>
-
-      {/* Confirm Password */}
-      <div className="form-group">
-        <label htmlFor="confirmPassword">Confirm Password</label>
-        <input
-          type="password"
-          className="form-control"
-          id="confirmPassword"
-          onChange={handleChange}
-        />
-      </div>
-
-      {/* Button */}
+      {/* button */}
       <button type="submit" className="btn btn-primary">
         Submit
       </button>
     </form>
   );
 };
+
+const fields = [
+  { name: "fullName", type: "text", error: "FullName" },
+  { name: "email", type: "text", error: "Email" },
+  { name: "password", type: "password", error: "Password" },
+  { name: "confirmPassword", type: "password", error: "ConfirmPassword" },
+];
 
 export default Register;

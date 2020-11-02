@@ -27,7 +27,7 @@ const Nav = ({ changeEmail, email }) => {
               </li>
 
               <li className="nav-item">
-                <a href="#" className="nav-link" onClick={changeEmail}>
+                <a href="/logout" className="nav-link" onClick={changeEmail}>
                   Logout
                 </a>
               </li>

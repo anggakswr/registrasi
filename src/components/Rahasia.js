@@ -4,7 +4,11 @@ import { connect } from "react-redux";
 const Rahasia = ({ email }) => {
   return (
     <>
-      <div>{email && "Selamat anda berhasil login."}</div>
+      <div>
+        {email
+          ? "Selamat anda berhasil login."
+          : "Anda tidak berhak melihat halaman ini."}
+      </div>
     </>
   );
 };
